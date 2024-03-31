@@ -32,12 +32,33 @@ class ChimpokodexRepository extends ServiceEntityRepository
     }
 
     /**
+     * Retourne le chimpokodex suivant son id si il est activé
+     *
      * @param int $id
      * @return array
      */
     public function byIdActivated(int $id): array
     {
-        return $this->createQueryBuilder("c")->andWhere("c.status = 'on'")->andWhere("c.id = '" . $id . "'")->getQuery()->getResult();
+        return $this->createQueryBuilder("c")
+            ->andWhere("c.status = 'on'")
+            ->andWhere("c.id = '" . $id . "'")
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Renvoie un nombre aleatoire d'éléments du pokédex
+     *
+     * @param int $number
+     * @return float|int|mixed|string
+     */
+    public function getRandomChimpokodex(int $number) {
+        return $this->createQueryBuilder('c')
+            ->where("c.status = 'on'")
+            ->orderBy('RAND()')
+            ->setMaxResults($number)
+            ->getQuery()
+            ->getResult();
     }
 
 //    /**

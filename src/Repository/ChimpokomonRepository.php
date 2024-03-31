@@ -21,6 +21,21 @@ class ChimpokomonRepository extends ServiceEntityRepository
         parent::__construct($registry, Chimpokomon::class);
     }
 
+    /**
+     * Renvoie l'array d'un chimpokomon si il est activé
+     *
+     * @param int $id
+     * @return array
+     */
+    public function byIdActivated(int $id): array
+    {
+        return $this->createQueryBuilder("c")
+            ->andWhere("c.status = 'on'")
+            ->andWhere("c.id = '" . $id . "'")
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Chimpokomon[] Returns an array of Chimpokomon objects
 //     */

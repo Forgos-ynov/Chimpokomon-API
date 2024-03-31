@@ -9,6 +9,7 @@ use App\Repository\ChimpokodexRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Cache\InvalidArgumentException;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,10 +21,18 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ChimpokodexController extends AbstractController
 {
+    private ChimpokodexRepository $oRepository;
+    private SerializerInterface $serializer;
+
+    public function __construct(SerializerInterface $serializer,ChimpokodexRepository $oRepository)
+    {
+        $this->oRepository = $oRepository;
+        $this->serializer = $serializer;
+    }
+
     /**
      * Renvoie l'ensemble des chimpokomon du chimpokodex
      *
@@ -49,10 +58,28 @@ class ChimpokodexController extends AbstractController
         $jsonChimpokodex = $cache->get($idCache, function (ItemInterface $item) use ($oRepository, $serializer) {
             $item->tag("chimpokodexCache");
             $aChimpokodex = $oRepository->allActivated();
-            return $serializer->serialize($aChimpokodex, "json", ["groups" => "getAllWhitinEvolutions"]);
+            return $serializer->serialize($aChimpokodex, "json", ["groups" => "getAllChimpokodex"]);
         });
 
         return new JsonResponse($jsonChimpokodex, 200, [], true);
+    }
+
+    #[Route("/api/chimpokodex/random", name: "chimpokodex_getRandomChimpokodex_get", methods: ["GET"])]
+    public function getRandomChimpokodex(Request $oRequest): JsonResponse
+    {
+        $defaultValue = 10;
+        if ($oRequest->getContent() === "")
+        {
+            $randomNumber = $defaultValue;
+        } else
+        {
+            $randomNumber = $oRequest->toArray()["randomNumber"] ?? $defaultValue;
+        }
+
+        $aRandomChimpokodex = $this->oRepository->getRandomChimpokodex($randomNumber);
+
+        $jsonChimpokodex = $this->serializer->serialize($aRandomChimpokodex, 'json', ['groups' => 'getAllChimpokodex']);
+        return new JsonResponse($jsonChimpokodex, Response::HTTP_OK, [], true);
     }
 
     /**
@@ -69,7 +96,7 @@ class ChimpokodexController extends AbstractController
         $aChimpokodex = $oChimpokodexRepository->byIdActivated($id);
 
         if (sizeof($aChimpokodex) === 1) {
-            $jsonChimpokodex = $serializer->serialize($aChimpokodex[0], "json", ["groups" => "getAllWhitinEvolutions"]);
+            $jsonChimpokodex = $serializer->serialize($aChimpokodex[0], "json", ["groups" => "getAllChimpokodex"]);
             return new JsonResponse($jsonChimpokodex, Response::HTTP_OK, [], true);
         }
         return new JsonResponse(["message" => "Ressource not found :'("], Response::HTTP_NOT_FOUND);
@@ -118,7 +145,7 @@ class ChimpokodexController extends AbstractController
 
         $location = $urlGenerator->generate("chimpokodex_get_byId", ["id" => $oChimpokodex->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $jsonChimpokodex = $serializer->serialize($oChimpokodex, "json", ["groups" => "getAllWhitinEvolutions"]);
+        $jsonChimpokodex = $serializer->serialize($oChimpokodex, "json", ["groups" => "getAllChimpokodex"]);
         return new JsonResponse($jsonChimpokodex, Response::HTTP_CREATED, ["Location" => $location], true);
     }
 

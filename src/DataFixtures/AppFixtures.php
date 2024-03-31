@@ -4,12 +4,15 @@ namespace App\DataFixtures;
 
 use App\Entity\Chimpokodex;
 use App\Entity\Persona;
+use App\Entity\Picture;
 use App\Entity\User;
+use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use Faker\Generator;
 use Random\RandomException;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
@@ -35,24 +38,61 @@ class AppFixtures extends Fixture
      *
      * @param ObjectManager $manager
      * @return void
-     * @throws RandomException
      */
     public function load(ObjectManager $manager): void
     {
-        $chimpokodexEntries = [];
-        for ($i = 0; $i < 100; $i++) {
-            $chimpokodex = new Chimpokodex();
+        $today = new DateTime();
+
+        $aPictureEntries = [];
+        $aChimpokodexEntries = [];
+
+        // Picture
+        $aPicturesPath = glob(stream_resolve_include_path("public/medias/pictures") . "/*.*");
+        foreach ($aPicturesPath as $picturePath)
+        {
+            $pictureRealPath = explode("/pictures/", $picturePath)[1];
+            $oFile = new File($picturePath, true);
+            $mimeType = strrchr($pictureRealPath, ".");
+            $nameWithoutMime = substr($pictureRealPath, 0, strrpos($pictureRealPath, '-'));
+            $name = $nameWithoutMime . $mimeType;
+
+            $oPicture = new Picture();
+
+            $oPicture->setStatus("on")
+                ->setName($name)
+                ->setCreatedAt($today)
+                ->setUpdatedAt($today)
+                ->setRealName($name)
+                ->setMimeType($oFile->getMimeType())
+                ->setRealPath($pictureRealPath)
+                ->setPublicPath("/public/medias/pictures")
+                ->setFile($oFile);
+
+            $aPictureEntries[] = $oPicture;
+            $manager->persist($oPicture);
+        }
+
+        // Chimpoxodex
+        for ($i = 0; $i < 100; $i++)
+        {
+            $oChimpokodex = new Chimpokodex();
             $created = $this->faker->dateTimeBetween("-1 week");
             $updated = $this->faker->dateTimeBetween($created);
-            $chimpokodex
+            $oChimpokodex
                 ->setName($this->generateChimpokoName())
-                ->setPvMax(100)
+                ->setMaxPv(random_int(150, 250))
+                ->setMinPv(random_int(100, $oChimpokodex->getMaxPv()))
+                ->setMaxAttack(random_int(50, 150))
+                ->setMinAttack(random_int(25, $oChimpokodex->getMaxAttack()))
+                ->setMaxDefense(random_int(50, 100))
+                ->setMinDefense(random_int(10, $oChimpokodex->getMaxDefense()))
                 ->setCreatedAt($created)
                 ->setUpdatedAt($updated)
-                ->setStatus("on");
+                ->setStatus("on")
+                ->setPicture($aPictureEntries[array_rand($aPictureEntries)]);
 
-            $chimpokodexEntries[] = $chimpokodex;
-            $manager->persist($chimpokodex);
+            $aChimpokodexEntries[] = $oChimpokodex;
+            $manager->persist($oChimpokodex);
         }
 
         $oPersona = new Persona();
@@ -72,7 +112,10 @@ class AppFixtures extends Fixture
         $oPublicUser->setUsername("public")
             ->setRoles(["PUBLIC"])
             ->setPassword($this->userPasswordHasher->hashPassword($oPublicUser, "public"))
-            ->setPersona($oPersona);
+            ->setPersona($oPersona)
+            ->setStatus("on")
+            ->setCreatedAt($today)
+            ->setUpdatedAt($today);
         $manager->persist($oPublicUser);
 
         // Set admin User
@@ -80,40 +123,22 @@ class AppFixtures extends Fixture
         $oAdminUser->setUsername("admin")
             ->setRoles(["ADMIN"])
             ->setPassword($this->userPasswordHasher->hashPassword($oAdminUser, "password"))
-            ->setPersona($oPersona);
+            ->setPersona($oPersona)
+            ->setStatus("on")
+            ->setCreatedAt($today)
+            ->setUpdatedAt($today);
         $manager->persist($oAdminUser);
 
 
-
         /**
-        $chimpokodexEntries = [];
-        for ($i = 0; $i < 100; $i++) {
-            //Instantiate new Chimpokodex Entity to Fullfill
-            $chimpokodex = new Chimpokodex();
-            //Handle created && updated datetime
-            $created = $this->faker->dateTimeBetween("-1 week", "now");
-            $updated = $this->faker->dateTimeBetween($created, "now");
-            //Asign Properties to Entity
-            $chimpokodex
-                ->setName($this->faker->word())
-                ->setPvMax(100)
-                ->setCreatedAt($created)
-                ->setUpdatedAt($updated)
-                ->setStatus("on");
-
-            //stock Chimpokodex Entry
-            $chimpokodexEntries[] = $chimpokodex;
-            //Add to transaction
-            $manager->persist($chimpokodex);
-        }
-
-        //Execute transaction
-        foreach ($chimpokodexEntries as $key => $chimpokodexEntry) {
-            $evolution = $chimpokodexEntries[array_rand($chimpokodexEntries, 1)];
-            $chimpokodexEntry->addEvolution($evolution);
-            $manager->persist($chimpokodexEntry);
-        }
-*/
+         *
+         * //Execute transaction
+         * foreach ($chimpokodexEntries as $key => $chimpokodexEntry) {
+         * $evolution = $chimpokodexEntries[array_rand($chimpokodexEntries, 1)];
+         * $chimpokodexEntry->addEvolution($evolution);
+         * $manager->persist($chimpokodexEntry);
+         * }
+         */
         $manager->flush();
     }
 

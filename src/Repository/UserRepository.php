@@ -40,6 +40,37 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    /**
+     * Fonction permettant de résupérer tous les utilisateurs activés
+     *
+     * @return float|int|mixed|string
+     */
+    public function getAllUsersActivated()
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere("u.status = 'on'")
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    /**
+     * Permet de retrouver un utilisateur suivant son username
+     *
+     * @param string $username
+     * @return float|int|mixed|string
+     */
+    public function getUserByUsername(string $username)
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere("u.username = :username")
+            ->setParameter('username', $username)
+            ->andWhere("u.status = 'on'")
+            ->getQuery()
+            ->getResult()[0]
+            ;
+    }
+
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */

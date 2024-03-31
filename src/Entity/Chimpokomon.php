@@ -38,6 +38,15 @@ class Chimpokomon
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updatedAt = null;
 
+    #[ORM\OneToOne(mappedBy: 'chimpokomon', cascade: ['persist', 'remove'])]
+    private ?Team $team = null;
+
+    #[ORM\Column]
+    private ?int $attack = null;
+
+    #[ORM\Column]
+    private ?int $defense = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -123,6 +132,52 @@ class Chimpokomon
     public function setUpdatedAt(\DateTimeInterface $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getTeam(): ?Team
+    {
+        return $this->team;
+    }
+
+    public function setTeam(?Team $team): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($team === null && $this->team !== null) {
+            $this->team->setChimpokomon(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($team !== null && $team->getChimpokomon() !== $this) {
+            $team->setChimpokomon($this);
+        }
+
+        $this->team = $team;
+
+        return $this;
+    }
+
+    public function getAttack(): ?int
+    {
+        return $this->attack;
+    }
+
+    public function setAttack(int $attack): static
+    {
+        $this->attack = $attack;
+
+        return $this;
+    }
+
+    public function getDefense(): ?int
+    {
+        return $this->defense;
+    }
+
+    public function setDefense(int $defense): static
+    {
+        $this->defense = $defense;
 
         return $this;
     }
