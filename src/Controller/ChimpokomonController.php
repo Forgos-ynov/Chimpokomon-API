@@ -84,6 +84,7 @@ class ChimpokomonController extends AbstractController
             ->setAttack(random_int($oChimpokodex->getMinAttack(), $oChimpokodex->getMaxAttack()))
             ->setDefense(random_int($oChimpokodex->getMinDefense(), $oChimpokodex->getMaxDefense()))
             ->setChimpokodex($oChimpokodex)
+            ->setPicture($oChimpokodex->getPicture())
             ->setCreatedAt(new DateTime())
             ->setUpdatedAt(new DateTime())
             ->setStatus("on");
@@ -92,8 +93,6 @@ class ChimpokomonController extends AbstractController
         $this->manager->flush();
 
         $location = $this->urlGenerator->generate("chimpokomon_byId_get", ["id" => $oChimpokomon->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        $jsonChimpokomon = $this->serializer->serialize($oChimpokomon, "json", ["groups" => "getAllChimpokokomon"]);
-        return new JsonResponse($jsonChimpokomon, Response::HTTP_CREATED, ["Location" => $location], true);
+        return new JsonResponse(null, Response::HTTP_CREATED, ["Location" => $location]);
     }
 }

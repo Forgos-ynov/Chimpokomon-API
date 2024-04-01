@@ -19,15 +19,15 @@ class Picture
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["getAllChimpokodex", "getOnPicture"])]
+    #[Groups(["getAllChimpokodex", "getOnPicture", "getAllChimpokokomon", "getAllTeam"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getAllChimpokodex", "getOnPicture"])]
+    #[Groups(["getAllChimpokodex", "getOnPicture", "getAllChimpokokomon", "getAllTeam"])]
     private ?string $realName = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getAllChimpokodex", "getOnPicture"])]
+    #[Groups(["getAllChimpokodex", "getOnPicture", "getAllChimpokokomon", "getAllTeam"])]
     private ?string $realPath = null;
 
     #[ORM\Column(length: 255)]

@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\TeamRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TeamRepository::class)]
 class Team
@@ -12,15 +13,19 @@ class Team
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["getAllChimpokokomon, getAllTeam"])]
     private ?int $id = null;
 
     #[ORM\OneToOne(inversedBy: 'team', cascade: ['persist', 'remove'])]
+    #[Groups(["getAllTeam"])]
     private ?Chimpokomon $chimpokomon = null;
 
     #[ORM\OneToOne(inversedBy: 'team', cascade: ['persist', 'remove'])]
+    #[Groups(["getAllChimpokokomon", "getAllTeam"])]
     private ?User $trainer = null;
 
     #[ORM\Column]
+    #[Groups(["getAllTeam"])]
     private ?bool $favorite = null;
 
     #[ORM\Column(length: 25)]

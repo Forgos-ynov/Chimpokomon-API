@@ -129,16 +129,6 @@ class AppFixtures extends Fixture
             ->setUpdatedAt($today);
         $manager->persist($oAdminUser);
 
-
-        /**
-         *
-         * //Execute transaction
-         * foreach ($chimpokodexEntries as $key => $chimpokodexEntry) {
-         * $evolution = $chimpokodexEntries[array_rand($chimpokodexEntries, 1)];
-         * $chimpokodexEntry->addEvolution($evolution);
-         * $manager->persist($chimpokodexEntry);
-         * }
-         */
         $manager->flush();
     }
 

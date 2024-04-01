@@ -108,7 +108,7 @@ class UserController extends AbstractController
             return new JsonResponse(null, Response::HTTP_NO_CONTENT);
         }
 
-        $jsonTeam = $this->serializer->serialize($oTeam, "json");
+        $jsonTeam = $this->serializer->serialize($oTeam, "json", ["groups" => "getAllTeam"]);
         return new JsonResponse($jsonTeam, Response::HTTP_OK, [], true);
     }
 }

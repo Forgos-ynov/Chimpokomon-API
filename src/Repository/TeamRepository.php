@@ -21,6 +21,21 @@ class TeamRepository extends ServiceEntityRepository
         parent::__construct($registry, Team::class);
     }
 
+    /**
+     * Récupère une team suivant son id
+     *
+     * @param int $id
+     * @return array
+     */
+    public function byIdActivated(int $id): array
+    {
+        return $this->createQueryBuilder("t")
+            ->andWhere("t.status = 'on'")
+            ->andWhere("t.id = '" . $id . "'")
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Team[] Returns an array of Team objects
 //     */

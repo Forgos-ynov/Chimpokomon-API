@@ -14,15 +14,19 @@ class Chimpokomon
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["getAllChimpokokomon", "getAllTeam"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["getAllChimpokokomon", "getAllTeam"])]
     private ?string $name = null;
 
     #[ORM\Column]
+    #[Groups(["getAllChimpokokomon", "getAllTeam"])]
     private ?int $pv = null;
 
     #[ORM\Column]
+    #[Groups(["getAllChimpokokomon", "getAllTeam"])]
     private ?int $pvMax = null;
 
     #[ORM\ManyToOne]
@@ -30,22 +34,32 @@ class Chimpokomon
     private ?Chimpokodex $chimpokodex = null;
 
     #[ORM\Column(length: 24)]
+    #[Groups(["getAllChimpokokomon"])]
     private ?string $status = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["getAllChimpokokomon"])]
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["getAllChimpokokomon"])]
     private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\OneToOne(mappedBy: 'chimpokomon', cascade: ['persist', 'remove'])]
+    #[Groups(["getAllChimpokokomon"])]
     private ?Team $team = null;
 
     #[ORM\Column]
+    #[Groups(["getAllChimpokokomon", "getAllTeam"])]
     private ?int $attack = null;
 
     #[ORM\Column]
+    #[Groups(["getAllChimpokokomon", "getAllTeam"])]
     private ?int $defense = null;
+
+    #[ORM\ManyToOne]
+    #[Groups(["getAllChimpokokomon", "getAllTeam"])]
+    private ?Picture $picture = null;
 
     public function getId(): ?int
     {
@@ -178,6 +192,18 @@ class Chimpokomon
     public function setDefense(int $defense): static
     {
         $this->defense = $defense;
+
+        return $this;
+    }
+
+    public function getPicture(): ?Picture
+    {
+        return $this->picture;
+    }
+
+    public function setPicture(?Picture $picture): static
+    {
+        $this->picture = $picture;
 
         return $this;
     }
